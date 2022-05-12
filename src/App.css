@@ -27,6 +27,20 @@
 .App-link {
   color: #61dafb;
 }
+.todoList {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 400px;
+  margin: auto
+}
+
+.todoItem {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+}
+  
 
 @keyframes App-logo-spin {
   from {
