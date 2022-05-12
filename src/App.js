@@ -1,10 +1,14 @@
 import { useState } from 'react';
 import './App.css';
+import RenderIf from './components/RenderIf';
 // import TodoList from './components/TodoList';
 
 function App() {
   const [ todos, setTodos ] = useState([]);
-  console.log("🚀 ~ file: App.js ~ line 7 ~ App ~ todos", todos)
+  const [isUpdateTodo, setIsUpdateTodo] = useState(false);
+  let newValue;
+  console.log("🚀 ~ file: App.js ~ line 10 ~ App ~ newValue", newValue)
+  console.log("🚀 ~ file: App.js ~ line 7 ~ App ~ todos", todos);
   // const [ checkedTodo, setCheckedTodo ] = useState([])
 
   const getTodo = () => {
@@ -16,24 +20,12 @@ function App() {
   }
 
   const removeTodo = (id) => {
-    setTodos([
-      ...todos.slice(0, id),
-      ...todos.slice(id + 1)
-    ]);
+    console.log("🚀 ~ file: App.js ~ line 20 ~ removeTodo ~ id", id)
+    const newTodos = todos.filter(todo => !(todo.id === id));
+    console.log("🚀 ~ file: App.js ~ line 22 ~ removeTodo ~ newTodos", newTodos)
+    setTodos(newTodos);
   }
 
-  // const tickTodo = (event, id) => {
-  //   const targetedTodo = todos[id];
-  //   // If checked checkbox
-  //   if(event.target.checked) {
-  //     setCheckedTodo([...checkedTodo, { id, value: targetedTodo }]);
-  //     return;
-  //   }
-
-  //   // If unchecked checkbox
-  //   const newCheckedTodo = checkedTodo.filter(todo => todo.id !== id);
-  //   setCheckedTodo(newCheckedTodo);
-  // }
 
   const tickTodo = (event, id) => {
     const newTodos = todos.map(todo => {
@@ -45,6 +37,21 @@ function App() {
     setTodos(newTodos);
   }
 
+  const updateTodo = (newValue, id) => {
+    const isAccept = window.confirm("Do you want to update todo?");
+    if(!isAccept) return;
+    
+    console.log("🚀 ~ file: App.js ~ line 42 ~ updateTodo ~ isAccept", isAccept)
+    const newTodos = todos.map(todo => {
+      if(todo.id === id) {
+        todo.value = newValue
+      }
+      return todo;
+    })
+
+    setTodos(newTodos);
+  }
+
   return (
     <div className="App" >
       <h1>TODO</h1>
@@ -52,8 +59,7 @@ function App() {
       <input type="text" id='todoInput'></input>
       <button id="todoBtn" onClick={getTodo}>Add</button>
 
-      { todos.length > 0 
-        ? 
+      <RenderIf isTrue={todos.length > 0} isFalse="Nothing">
         <ul id="todoList" className='todoList'>
           { todos.map((todo, ids) => (
             <li key={ids} className='todoItem'>
@@ -63,16 +69,25 @@ function App() {
               >
 
               </input>
-              <p contentEditable={true} >{todo.value}</p>
-              <button key={ids} data-todo={ids} onClick={() => removeTodo(ids)}>X</button>
+              <p  
+                contentEditable={true}
+                onInput={(event) => {
+                  newValue = event.target.textContent;
+                  console.log("🚀 ~ file: App.js ~ line 76 ~ App ~ newValue", newValue)
+                  setIsUpdateTodo(true)
+                }}
+              >{todo.value}</p>
+              <RenderIf isTrue={isUpdateTodo} isFalse=''>
+                <button onClick={() => updateTodo(newValue, todo.id)}>Save</button>
+              </RenderIf>
+              <button key={ids} data-todo={ids} onClick={() => removeTodo(todo.id)}>X</button>
             </li>
           ))}
         </ul> 
-        : <p>Nothing</p>
-      }
+      </RenderIf>
+
 
       <h1>Done list</h1>
-      
         <ul className='todoList'>
           { todos.filter(todo => todo.isChecked).map((todo, ids) => (
             <li key={ids} className='todoItem'>
@@ -80,7 +95,6 @@ function App() {
             </li>
           ))}
         </ul> 
-      
       
     </div>
   );
